@@ -9,12 +9,26 @@
 
 ## 遊ぶ
 
-### 1. 単一ファイルをそのまま開く（一番手軽）
+### 1. GitHub Pages（他の人に渡すならこれ）
+
+**https://yuki-afroboy.github.io/Dopa-Break/**
+
+- `/` … 通常版（`src/` のモジュールをそのまま読む）
+- `/play.html` … 単一ファイル版
+
+`main` に push されるたび `.github/workflows/pages.yml` が単一HTMLを
+ビルドし直して自動デプロイする。公開されるものは常にソースと一致する。
+
+> 初回のみ、リポジトリ設定で Pages を有効にする必要がある場合があります
+> （Settings → Pages → Source を **GitHub Actions** に）。
+> ワークフローは `configure-pages` の `enablement: true` で自動有効化を試みます。
+
+### 2. 単一ファイルをそのまま開く（ネット不要）
 
 `dist/dopa-break.html` をダウンロードしてダブルクリックするだけ。
 サーバ不要・`file://` で動きます（HTML/CSS/JS を1ファイルに畳んであるため）。
 
-### 2. 開発用サーバで開く
+### 3. 開発用サーバで開く
 
 `src/` の ES Modules をそのまま読むため、こちらは**ローカルサーバ経由**が必要です
 （`file://` だと CORS でモジュールが読めません）。
@@ -110,6 +124,7 @@ localStorage 保存。結果画面にそのまま並ぶので、メニューを�
 ```
 index.html          エントリ（HUD と各オーバーレイの DOM）
 build.mjs           単一HTMLへのバンドル（依存ゼロ）
+.github/workflows/pages.yml   GitHub Pages への自動デプロイ
 dist/dopa-break.html  ビルド成果物。これ単体で遊べる
 css/style.css       HUD・カード・リザルト（safe-area / 片手操作前提）
 src/main.js         起動・キャンバス・入力・メインループ

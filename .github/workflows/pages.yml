@@ -1,0 +1,70 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# 同時実行を1本に絞る。進行中のデプロイは中断しない（公開中のサイトを壊さないため）
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  # ---------------------------------------------------------
+  # ビルド: どのブランチ・PRでも走らせて、壊れたら気付けるようにする
+  # ---------------------------------------------------------
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # 単一HTMLを毎回ビルドし直す。
+      # コミット済みの dist/ が古くても、公開されるものは常にソースと一致する。
+      - name: Build single-file bundle
+        run: node build.mjs
+
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          cp index.html _site/
+          cp -r css src dist _site/
+          # 単一ファイル版を /play.html でも開けるようにする
+          cp dist/dopa-break.html _site/play.html
+          ls -lR _site | head -40
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  # ---------------------------------------------------------
+  # デプロイ: main のみ
+  # （github-pages 環境は既定で「既定ブランチからのみ」に制限されている）
+  # ---------------------------------------------------------
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      # enablement: true で、未設定なら Pages 自体をここで有効化する
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

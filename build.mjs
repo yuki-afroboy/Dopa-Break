@@ -65,8 +65,15 @@ function bundle() {
     parts.push(`/* ===== ${file} ===== */\n${code.trim()}`);
   }
 
-  // IIFE で包んでグローバルを汚さない
-  return `(() => {\n'use strict';\n\n${parts.join('\n\n')}\n})();`;
+  const out = `(() => {\n'use strict';\n\n${parts.join('\n\n')}\n})();`;
+
+  // import/export が残っていると、通常の <script> では構文エラーで
+  // ゲームが起動しない。壊れた成果物を出さないためここで落とす。
+  const leftover = out.match(/^\s*(import|export)\s/gm);
+  if (leftover) {
+    throw new Error(`バンドル後に ${leftover.length} 個の import/export が残っています: ${[...new Set(leftover.map((s) => s.trim()))].join(', ')}`);
+  }
+  return out;
 }
 
 function buildBody() {
@@ -80,11 +87,13 @@ function buildBody() {
     .trim();
 
   const title = (html.match(/<title>([\s\S]*?)<\/title>/) || [, 'DOPA BREAK'])[1];
+  // favicon は data URI なので、そのまま単一ファイル版へ持ち越せる
+  const icon = (html.match(/<link\s+rel=["']icon["'][^>]*>/) || [''])[0];
 
-  return { body, css, js, title };
+  return { body, css, js, title, icon };
 }
 
-const { body, css, js, title } = buildBody();
+const { body, css, js, title, icon } = buildBody();
 
 const bodyOnly = `<title>${title}</title>
 <style>
@@ -106,10 +115,18 @@ const full = `<!doctype html>
 <meta name="theme-color" content="#05060d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-${bodyOnly.split('\n')[0]}
+<title>${title}</title>
+${icon}
+<style>
+${css}
+</style>
 </head>
 <body>
-${bodyOnly.split('\n').slice(1).join('\n')}
+${body}
+
+<script>
+${js}
+</script>
 </body>
 </html>
 `;
