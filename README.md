@@ -7,20 +7,34 @@
 
 ---
 
-## 起動方法
+## 遊ぶ
 
-ES Modules を使っているため、`file://` で直接開かず**ローカルサーバ経由**で開いてください。
+### 1. 単一ファイルをそのまま開く（一番手軽）
+
+`dist/dopa-break.html` をダウンロードしてダブルクリックするだけ。
+サーバ不要・`file://` で動きます（HTML/CSS/JS を1ファイルに畳んであるため）。
+
+### 2. 開発用サーバで開く
+
+`src/` の ES Modules をそのまま読むため、こちらは**ローカルサーバ経由**が必要です
+（`file://` だと CORS でモジュールが読めません）。
 
 ```bash
-# どれか1つ
 python3 -m http.server 8080     # or: npm start
-npx serve .
-php -S localhost:8080
 ```
 
 ブラウザで `http://localhost:8080/` を開く。
+スマホ実機で試す場合は同じ Wi-Fi 内から `http://<PCのIP>:8080/`。
 
-スマホで試す場合は同じ Wi-Fi 内から `http://<PCのIP>:8080/` にアクセスしてください。
+### 単一ファイルのビルド
+
+```bash
+npm run build      # -> dist/dopa-break.html
+```
+
+`build.mjs` が `src/` の各モジュールを依存順に連結し、CSS とともに1つの HTML へ埋め込みます。
+連結後は1スコープになるため、トップレベル名が衝突した場合はビルドが**エラーで停止**します
+（気付かないうちに上書きされるのを防ぐため）。依存パッケージはありません。
 
 ## 操作方法
 
@@ -95,6 +109,8 @@ localStorage 保存。結果画面にそのまま並ぶので、メニューを�
 
 ```
 index.html          エントリ（HUD と各オーバーレイの DOM）
+build.mjs           単一HTMLへのバンドル（依存ゼロ）
+dist/dopa-break.html  ビルド成果物。これ単体で遊べる
 css/style.css       HUD・カード・リザルト（safe-area / 片手操作前提）
 src/main.js         起動・キャンバス・入力・メインループ
 src/config.js       全チューニング値（バランスはここだけ触れば済む）
