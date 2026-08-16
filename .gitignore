@@ -1,0 +1,3 @@
+# Pages ワークフローが生成する一時成果物（コミットしない）
+_site/
+node_modules/
