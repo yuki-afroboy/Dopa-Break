@@ -1,0 +1,13 @@
+{
+  "name": "dopa-break",
+  "version": "0.1.0",
+  "description": "DOPA BREAK - 60秒の超短時間・大量破壊ローグライト（ブラウザゲーム / 依存ゼロ）",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "dev": "python3 -m http.server 8080",
+    "build": "node build.mjs"
+  },
+  "license": "MIT"
+}
