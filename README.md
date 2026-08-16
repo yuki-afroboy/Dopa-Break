@@ -19,9 +19,12 @@
 `main` に push されるたび `.github/workflows/pages.yml` が単一HTMLを
 ビルドし直して自動デプロイする。公開されるものは常にソースと一致する。
 
-> 初回のみ、リポジトリ設定で Pages を有効にする必要がある場合があります
-> （Settings → Pages → Source を **GitHub Actions** に）。
-> ワークフローは `configure-pages` の `enablement: true` で自動有効化を試みます。
+> **初回のみ手動設定が必要です。**
+> Settings → Pages → Build and deployment → Source を **GitHub Actions** に変更してください。
+>
+> `GITHUB_TOKEN` の `pages: write` は既存の Pages へデプロイする権限であり、
+> Pages サイトそのものを作成する権限は持たないため、ここは自動化できません
+> （自動化を試みると `Resource not accessible by integration` で失敗します）。
 
 ### 2. 単一ファイルをそのまま開く（ネット不要）
 

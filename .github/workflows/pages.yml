@@ -61,10 +61,11 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      # enablement: true で、未設定なら Pages 自体をここで有効化する
+      # GITHUB_TOKEN の pages:write は「既存の Pages へデプロイする」権限で、
+      # Pages サイトの新規作成はできない（Resource not accessible by integration）。
+      # そのため初回のみ Settings → Pages → Source を "GitHub Actions" に
+      # 設定しておく必要がある。ここでは有効化を試みず、設定済みの前提で進める。
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - id: deployment
         uses: actions/deploy-pages@v4
